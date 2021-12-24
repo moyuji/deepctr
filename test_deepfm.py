@@ -3,8 +3,8 @@ import torch
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 
-from preprocessing.inputs import SparseFeat, DenseFeat, get_feature_names
-from model.deepfm import DeepFM
+from deepctr.preprocessing.inputs import SparseFeat, DenseFeat, get_feature_names
+from deepctr.model.deepfm import DeepFM
 
 
 if __name__ == '__main__':

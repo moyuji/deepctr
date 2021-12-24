@@ -1,6 +1,6 @@
 import torch
-from model.base_model import BaseModel
-from layers.interaction import FM, AFMLayer
+from deepctr.model.base_model import BaseModel
+from deepctr.layers.interaction import FM, AFMLayer
 
 
 class AFM(BaseModel):

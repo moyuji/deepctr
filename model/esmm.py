@@ -4,9 +4,9 @@
 @info:
 """
 
-from model.base_tower import BaseTower
-from preprocessing.inputs import combined_dnn_input, concat_fun
-from layers.core import DNN
+from deepctr.model.base_tower import BaseTower
+from deepctr.preprocessing.inputs import combined_dnn_input, concat_fun
+from deepctr.layers.core import DNN
 
 
 class ESMM(BaseTower):

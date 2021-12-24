@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
-from model.base_model import BaseModel
-from layers.sequence import AttentionSequencePoolingLayer
-from layers.core import DNN
-from preprocessing.inputs import *
+from deepctr.model.base_model import BaseModel
+from deepctr.layers.sequence import AttentionSequencePoolingLayer
+from deepctr.layers.core import DNN
+from deepctr.preprocessing.inputs import *
 
 
 class DIN(BaseModel):

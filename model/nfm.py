@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
-from model.base_model import BaseModel
-from layers.interaction import BiInteractionPooling
-from layers.core import DNN
-from preprocessing.inputs import combined_dnn_input
+from deepctr.model.base_model import BaseModel
+from deepctr.layers.interaction import BiInteractionPooling
+from deepctr.layers.core import DNN
+from deepctr.preprocessing.inputs import combined_dnn_input
 
 
 class NFM(BaseModel):

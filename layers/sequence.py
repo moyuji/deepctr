@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from layers.core import LocalActivationUnit
+from deepctr.layers.core import LocalActivationUnit
 
 
 class SequencePoolingLayer(nn.Module):

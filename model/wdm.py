@@ -1,7 +1,7 @@
 import torch.nn as nn
-from model.base_model import BaseModel
-from layers.core import DNN
-from preprocessing.inputs import combined_dnn_input
+from deepctr.model.base_model import BaseModel
+from deepctr.layers.core import DNN
+from deepctr.preprocessing.inputs import combined_dnn_input
 
 
 class WideDeep(BaseModel):

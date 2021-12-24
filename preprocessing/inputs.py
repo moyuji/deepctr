@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from collections import OrderedDict, namedtuple
-from layers.sequence import SequencePoolingLayer
+from deepctr.layers.sequence import SequencePoolingLayer
 from collections import OrderedDict, namedtuple, defaultdict
 from itertools import chain
 

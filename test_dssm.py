@@ -5,8 +5,8 @@ from sklearn.metrics import log_loss, roc_auc_score
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 from keras.preprocessing.sequence import pad_sequences
 
-from preprocessing.inputs import SparseFeat, DenseFeat, VarLenSparseFeat
-from model.dssm import DSSM
+from deepctr.preprocessing.inputs import SparseFeat, DenseFeat, VarLenSparseFeat
+from deepctr.model.dssm import DSSM
 
 
 def data_process(data_path, samp_rows=10000):
@@ -74,7 +74,7 @@ def get_test_var_feature(data, col, key2index, max_len):
 
 if __name__ == '__main__':
     # %%
-    data_path = './data/movielens.txt'
+    data_path = '/kaggle/input/movielensjoined/movielens.txt'
     train, test, data = data_process(data_path, samp_rows=10000)
     train = get_user_feature(train)
     train = get_item_feature(train)

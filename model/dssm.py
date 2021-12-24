@@ -5,10 +5,10 @@
 2021.07.03: 加入取单塔功能
 """
 
-from model.base_tower import BaseTower
-from preprocessing.inputs import combined_dnn_input, compute_input_dim
-from layers.core import DNN
-from preprocessing.utils import Cosine_Similarity
+from deepctr.model.base_tower import BaseTower
+from deepctr.preprocessing.inputs import combined_dnn_input, compute_input_dim
+from deepctr.layers.core import DNN
+from deepctr.preprocessing.utils import Cosine_Similarity
 
 
 class DSSM(BaseTower):

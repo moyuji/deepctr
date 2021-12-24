@@ -10,10 +10,10 @@ from sklearn.metrics import *
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from preprocessing.inputs import SparseFeat, DenseFeat, VarLenSparseFeat, create_embedding_matrix, \
+from deepctr.preprocessing.inputs import SparseFeat, DenseFeat, VarLenSparseFeat, create_embedding_matrix, \
     get_varlen_pooling_list, build_input_features
-from layers.core import PredictionLayer
-from preprocessing.utils import slice_arrays
+from deepctr.layers.core import PredictionLayer
+from deepctr.preprocessing.utils import slice_arrays
 
 
 class BaseTower(nn.Module):
