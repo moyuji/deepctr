@@ -1,10 +1,3 @@
-"""
-@Author: 1365677361@qq.com
-
-@info:
-2021.07.03: 加入取单塔功能
-"""
-
 from deepctr.model.base_tower import BaseTower
 from deepctr.preprocessing.inputs import combined_dnn_input, compute_input_dim
 from deepctr.layers.core import SparseEncoding
@@ -16,10 +9,9 @@ class SDM(BaseTower):
                  dnn_hidden_units=(300, 300, 128), dnn_activation='relu', l2_reg_dnn=0, l2_reg_embedding=1e-6,
                  dnn_dropout=0, init_std=0.0001, seed=1024, task='binary', device='cpu', gpus=None, output_dim=1024,
                  item_norm_weight=0.0, user_norm_weight=0.0):
-        super(SDM, self).__init__(user_dnn_feature_columns, item_dnn_feature_columns, gamma=1, dnn_use_bn=True,
-                                  dnn_hidden_units=(300, 300, 128), dnn_activation='relu', l2_reg_dnn=0, l2_reg_embedding=1e-6,
-                                  dnn_dropout=0, init_std=0.0001, seed=1024, task='binary', device='cpu', gpus=None, output_dim=1024,
-                                  item_norm_weight=0.0, user_norm_weight=0.0)
+        super(SDM, self).__init__(user_dnn_feature_columns, item_dnn_feature_columns,
+                                  l2_reg_embedding=l2_reg_embedding, init_std=init_std, seed=seed, task=task,
+                                  device=device, gpus=gpus)
         if len(user_dnn_feature_columns) > 0:
             self.user_dnn = SparseEncoding(compute_input_dim(user_dnn_feature_columns), dnn_hidden_units,
                                            activation=dnn_activation, l2_reg=l2_reg_dnn, dropout_rate=dnn_dropout,
