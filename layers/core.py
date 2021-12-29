@@ -18,7 +18,7 @@ class PredictionLayer(nn.Module):
 
     def forward(self, X):
         if self.use_bias:
-            output = X * self.scales + self.bias
+            output = X * self.scale + self.bias
         else:
             output = X
         if self.task == "binary":
