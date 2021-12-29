@@ -124,7 +124,7 @@ class SparseEncoding(nn.Module):
                              dropout_rate=0.0,
                              dice_dim=dice_dim,
                              use_bn=use_bn)
-        self.embed_tower = DNN(inputs_dim=inputs_dim,
+        self.embed_tower = DNN(inputs_dim=last_hidden_dim,
                                hidden_units=(output_dim,),
                                activation=activation,
                                l2_reg=l2_reg,
