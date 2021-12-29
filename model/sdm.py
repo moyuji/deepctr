@@ -15,14 +15,14 @@ class SDM(BaseTower):
         if len(user_dnn_feature_columns) > 0:
             self.user_dnn = SparseEncoding(compute_input_dim(user_dnn_feature_columns), dnn_hidden_units,
                                            activation=dnn_activation, l2_reg=l2_reg_dnn, dropout_rate=dnn_dropout,
-                                           use_bn=dnn_use_bn, init_std=init_std, device=device, output_dim=1024,
+                                           use_bn=dnn_use_bn, init_std=init_std, device=device, output_dim=output_dim,
                                            norm_weight=user_norm_weight)
             self.user_dnn_embedding = None
 
         if len(item_dnn_feature_columns) > 0:
             self.item_dnn = SparseEncoding(compute_input_dim(item_dnn_feature_columns), dnn_hidden_units,
                                            activation=dnn_activation, l2_reg=l2_reg_dnn, dropout_rate=dnn_dropout,
-                                           use_bn=dnn_use_bn, init_std=init_std, device=device, output_dim=1024,
+                                           use_bn=dnn_use_bn, init_std=init_std, device=device, output_dim=output_dim,
                                            norm_weight=item_norm_weight)
             self.item_dnn_embedding = None
 
