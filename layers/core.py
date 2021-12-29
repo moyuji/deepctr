@@ -14,11 +14,13 @@ class PredictionLayer(nn.Module):
         self.task = task
         if self.use_bias:
             self.bias = nn.Parameter(torch.zeros((1,)))
+            self.scale = nn.Parameter(torch.ones((1,)))
 
     def forward(self, X):
-        output = X
         if self.use_bias:
-            output += self.bias
+            output = X * self.scales + self.bias
+        else:
+            output = X
         if self.task == "binary":
             output = torch.sigmoid(X)
         return output
