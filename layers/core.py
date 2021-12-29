@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from deepctr.layers.activation import activation_layer
+from torch.nn import functional as F
 
 
 class PredictionLayer(nn.Module):
@@ -24,7 +25,7 @@ class PredictionLayer(nn.Module):
 
 
 class DNN(nn.Module):
-    def __init__(self, inputs_dim, hidden_units, activation='relu', l2_reg=0, dropout_rate=0, use_bn=False,
+    def __init__(self, inputs_dim, hidden_units, activation='relu', l2_reg=0, dropout_rate=0.0, use_bn=False,
                  init_std=0.0001, dice_dim=3, seed=1024, device='cpu'):
         super(DNN, self).__init__()
         self.dropout_rate = dropout_rate
@@ -40,14 +41,14 @@ class DNN(nn.Module):
             hidden_units = list(hidden_units)
 
         self.linears = nn.ModuleList(
-            [nn.Linear(hidden_units[i], hidden_units[i+1]) for i in range(len(hidden_units) - 1)])
+            [nn.Linear(hidden_units[i], hidden_units[i + 1]) for i in range(len(hidden_units) - 1)])
 
         if self.use_bn:
             self.bn = nn.ModuleList(
-                [nn.BatchNorm1d(hidden_units[i+1]) for i in range(len(hidden_units) - 1)])
+                [nn.BatchNorm1d(hidden_units[i + 1]) for i in range(len(hidden_units) - 1)])
 
         self.activation_layers = nn.ModuleList(
-            [activation_layer(activation, hidden_units[i+1], dice_dim) for i in range(len(hidden_units) - 1)])
+            [activation_layer(activation, hidden_units[i + 1], dice_dim) for i in range(len(hidden_units) - 1)])
 
         for name, tensor in self.linears.named_parameters():
             if 'weight' in name:
@@ -93,16 +94,60 @@ class LocalActivationUnit(nn.Module):
         queries = query.expand(-1, user_behavier_len, -1)
 
         attention_input = torch.cat([queries, user_behavier, queries - user_behavier, queries * user_behavier],
-                                    dim=-1)    # [B, T, 4*E]
+                                    dim=-1)  # [B, T, 4*E]
         attention_out = self.dnn(attention_input)
 
-        attention_score = self.dense(attention_out)    # [B, T, 1]
+        attention_score = self.dense(attention_out)  # [B, T, 1]
 
         return attention_score
 
 
+class SparseEncoding(nn.Module):
+    def __init__(self, inputs_dim, hidden_units, activation='relu', l2_reg=0, dropout_rate=0.0, use_bn=False,
+                 init_std=0.0001, dice_dim=3, seed=1024, device='cpu', output_dim=4, norm_weight=0.0):
+        super(SparseEncoding, self).__init__()
+        last_hidden_dim = hidden_units[-1]
+        self.seed = seed
+        self.norm = nn.BatchNorm1d(last_hidden_dim, affine=False)
+        self.norm_weight = norm_weight
+        self.shared = DNN(inputs_dim=inputs_dim,
+                          hidden_units=hidden_units,
+                          activation=activation,
+                          l2_reg=l2_reg,
+                          dropout_rate=dropout_rate,
+                          dice_dim=dice_dim,
+                          use_bn=use_bn)
+        self.reg_tower = DNN(inputs_dim=last_hidden_dim,
+                             hidden_units=(output_dim,),
+                             activation=activation,
+                             l2_reg=l2_reg,
+                             dropout_rate=0.0,
+                             dice_dim=dice_dim,
+                             use_bn=use_bn)
+        self.embed_tower = DNN(inputs_dim=inputs_dim,
+                               hidden_units=(output_dim,),
+                               activation=activation,
+                               l2_reg=l2_reg,
+                               dropout_rate=0.0,
+                               dice_dim=dice_dim,
+                               use_bn=use_bn)
+        self.to(device)
 
+    def forward(self, inputs):
+        shared = self.shared(inputs)
+        embedding = self.embed_tower(shared)
+        alpha = self.reg_tower(shared)
+        alpha = self.norm(alpha)
+        alpha = alpha + self.norm_weight
+        weight = self.sample_attention(alpha)
+        embedding = embedding * weight
+        return embedding
 
-
-
-
+    def sample_attention(self, weights):
+        if self.training:
+            eps = torch.rand_like(weights)
+            s = torch.sigmoid((torch.log(eps) - torch.log(1.0 - eps) + weights) / self.beta)
+        else:
+            s = torch.sigmoid(weights / 0.001)
+        s = s * (self.high - self.low) + self.low
+        return F.hardtanh(s, min_val=0, max_val=1)
