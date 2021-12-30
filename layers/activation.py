@@ -8,7 +8,7 @@ class Identity(nn.Module):
     def forward(self, X):
         return X
 
-
+y
 def activation_layer(act_name, hidden_size=None, dice_dim=2):
     if isinstance(act_name, str):
         if act_name.lower() == 'sigmoid':
