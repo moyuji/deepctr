@@ -17,7 +17,7 @@ class SDM(BaseTower):
             self.user_dnn = SparseEncoding(compute_input_dim(user_dnn_feature_columns), dnn_hidden_units,
                                            activation=dnn_activation, l2_reg=l2_reg_dnn, dropout_rate=dnn_dropout,
                                            use_bn=dnn_use_bn, init_std=init_std, device=device, output_dim=output_dim,
-                                           norm_weight=item_norm_weight_end)
+                                           norm_weight=user_norm_weight_start)
             self.user_dnn_embedding = None
 
         if len(item_dnn_feature_columns) > 0:
