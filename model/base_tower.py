@@ -162,6 +162,8 @@ class BaseTower(nn.Module):
                 for name, result in eval_result.items():
                     epoch_logs["val_" + name] = result
 
+            self.train_epoch_end(epoch)
+
             if verbose > 0:
                 epoch_time = int(time.time() - start_time)
                 print('Epoch {0}/{1}'.format(epoch + 1, epochs))
@@ -356,11 +358,8 @@ class BaseTower(nn.Module):
             raise ValueError("embedding_dim of SparseFeat and VarlenSparseFeat must be same in this model!")
         return list(embedding_size_set)[0]
 
-
-
-
-
-
+    def train_epoch_end(self, epoch):
+        pass
 
 
 
