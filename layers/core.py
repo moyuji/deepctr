@@ -142,6 +142,7 @@ class SparseEncoding(nn.Module):
     def forward(self, inputs):
         shared = self.shared(inputs)
         embedding = self.embed_tower(shared)
+        embedding = nn.functional.normalize(embedding)
         alpha = self.reg_tower(shared)
         alpha = self.norm(alpha)
         alpha = alpha + self.norm_weight
