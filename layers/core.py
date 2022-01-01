@@ -147,6 +147,8 @@ class SparseEncoding(nn.Module):
         alpha = self.norm(alpha)
         alpha = alpha + self.norm_weight
         weight = self.sample_attention(alpha)
+        import numpy as np
+        print(f'weight {np.sum(weight.cpu().numpy())}')
         embedding = embedding * weight
         return embedding
 
