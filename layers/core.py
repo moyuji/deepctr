@@ -140,15 +140,16 @@ class SparseEncoding(nn.Module):
         self.to(device)
 
     def forward(self, inputs):
+        import numpy as np
         shared = self.shared(inputs)
         embedding = self.embed_tower(shared)
         embedding = nn.functional.normalize(embedding)
         alpha = self.reg_tower(shared)
         alpha = self.norm(alpha)
         alpha = alpha + self.norm_weight
+        print(f'alpha {np.mean(alpha.cpu().detach().numpy())}')
         weight = self.sample_attention(alpha)
-        import numpy as np
-        print(f'weight {np.sum(weight.cpu().detach().numpy())}')
+        print(f'weight {np.mean(weight.cpu().detach().numpy())}')
         embedding = embedding * weight
         return embedding
 
