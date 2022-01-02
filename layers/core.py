@@ -138,6 +138,7 @@ class SparseEncoding(nn.Module):
         self.high = high
         self.low = low
         self.to(device)
+        self.gate = True
 
     def forward(self, inputs):
         import numpy as np
@@ -151,6 +152,8 @@ class SparseEncoding(nn.Module):
         weight = self.sample_attention(alpha)
         if random.random() < 0.01:
             print(f'{self.norm_weight} alpha0 {np.mean(alpha0.cpu().detach().numpy())} alpha {np.mean(alpha.cpu().detach().numpy())} weight {np.mean(weight.cpu().detach().numpy())}')
+        if self.gate:
+            return embedding
         embedding = embedding * weight
         return embedding
 

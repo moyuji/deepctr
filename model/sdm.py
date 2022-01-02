@@ -9,7 +9,7 @@ class SDM(BaseTower):
                  dnn_hidden_units=(300, 300, 128), dnn_activation='relu', l2_reg_dnn=0, l2_reg_embedding=1e-6,
                  dnn_dropout=0, init_std=0.0001, seed=1024, task='binary', device='cpu', gpus=None, output_dim=1024,
                  item_norm_weight_start=0.0, user_norm_weight_start=0.0, item_norm_weight_end=0.0, user_norm_weight_end=0.0,
-                 norm_weight_warmup=1):
+                 norm_weight_warmup=1, gating_warmup=5):
         super(SDM, self).__init__(user_dnn_feature_columns, item_dnn_feature_columns,
                                   l2_reg_embedding=l2_reg_embedding, init_std=init_std, seed=seed, task=task,
                                   device=device, gpus=gpus)
