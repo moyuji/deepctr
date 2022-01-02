@@ -161,7 +161,7 @@ class SparseEncoding(nn.Module):
         alpha = alpha0 + self.norm_weight
         weight = self.sample_attention(alpha)
         if random.random() < 0.01:
-            print(f'{self.norm_weight} alpha0 {np.mean(alpha0.cpu().detach().numpy(), axis=1)} alpha {np.mean(alpha.cpu().detach().numpy())} weight {np.mean(weight.cpu().detach().numpy())}')
+            print(f'{self.norm_weight} alpha0 {np.mean(alpha0.cpu().detach().numpy(), axis=0)} alpha {np.mean(alpha.cpu().detach().numpy())} weight {np.mean(weight.cpu().detach().numpy())}')
         embedding = embedding * weight
         return embedding
 
