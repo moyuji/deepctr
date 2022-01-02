@@ -111,7 +111,7 @@ class SparseEncoding(nn.Module):
         super(SparseEncoding, self).__init__()
         last_hidden_dim = hidden_units[-1]
         self.seed = seed
-        self.norm = nn.BatchNorm1d(output_dim, affine=False, momentum=0.01)
+        self.norm = nn.BatchNorm1d(output_dim, affine=False)
         self.norm_weight = norm_weight
         self.shared = DNN(inputs_dim=inputs_dim,
                           hidden_units=hidden_units,
@@ -161,7 +161,7 @@ class SparseEncoding(nn.Module):
         alpha = alpha0 + self.norm_weight
         weight = self.sample_attention(alpha)
         if random.random() < 0.01:
-            print(f'{self.norm_weight} alpha0 {np.mean(alpha0.cpu().detach().numpy())} alpha {np.mean(alpha.cpu().detach().numpy())} weight {np.mean(weight.cpu().detach().numpy())}')
+            print(f'{self.norm_weight} alpha0 {np.mean(alpha0.cpu().detach().numpy(), axis=1)} alpha {np.mean(alpha.cpu().detach().numpy())} weight {np.mean(weight.cpu().detach().numpy())}')
         embedding = embedding * weight
         return embedding
 
