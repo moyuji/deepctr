@@ -120,20 +120,28 @@ class SparseEncoding(nn.Module):
                           dropout_rate=dropout_rate,
                           dice_dim=dice_dim,
                           use_bn=use_bn)
-        self.reg_tower = DNN(inputs_dim=last_hidden_dim,
-                             hidden_units=(output_dim,),
-                             activation="linear",
-                             l2_reg=l2_reg,
-                             dropout_rate=0.0,
-                             dice_dim=dice_dim,
-                             use_bn=use_bn)
-        self.embed_tower = DNN(inputs_dim=last_hidden_dim,
-                               hidden_units=(output_dim,),
-                               activation="linear",
-                               l2_reg=l2_reg,
-                               dropout_rate=0.0,
-                               dice_dim=dice_dim,
-                               use_bn=use_bn)
+        # self.reg_tower = DNN(inputs_dim=last_hidden_dim,
+        #                      hidden_units=(output_dim,),
+        #                      activation="linear",
+        #                      l2_reg=l2_reg,
+        #                      dropout_rate=0.0,
+        #                      dice_dim=dice_dim,
+        #                      use_bn=use_bn)
+        # self.embed_tower = DNN(inputs_dim=last_hidden_dim,
+        #                        hidden_units=(output_dim,),
+        #                        activation="linear",
+        #                        l2_reg=l2_reg,
+        #                        dropout_rate=0.0,
+        #                        dice_dim=dice_dim,
+        #                        use_bn=use_bn)
+        self.embed_tower = nn.Sequential(
+            nn.ReLU(),
+            nn.Linear(last_hidden_dim, output_dim),
+        )
+        self.reg_tower = nn.Sequential(
+            nn.Sigmoid(),
+            nn.Linear(last_hidden_dim, output_dim),
+        )
         self.beta = beta
         self.high = high
         self.low = low
