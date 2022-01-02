@@ -35,6 +35,7 @@ class SDM(BaseTower):
         self.task = task
         self.device = device
         self.gpus = gpus
+        self.gating_warmup = gating_warmup
 
     def forward(self, inputs):
         if len(self.user_dnn_feature_columns) > 0:
@@ -70,3 +71,6 @@ class SDM(BaseTower):
             self.item_dnn.norm_weight += self.item_norm_weight_inc
             self.user_dnn.norm_weight += self.user_norm_weight_inc
             print(self.item_dnn.norm_weight, self.user_dnn.norm_weight)
+        if epoch == self.gating_warmup:
+            self.item_dnn.gate = False
+            self.user_dnn.gate = False
