@@ -1,7 +1,7 @@
 from deepctr.model.base_tower import BaseTower
 from deepctr.preprocessing.inputs import combined_dnn_input, compute_input_dim
 from deepctr.layers.core import SparseEncoding
-from deepctr.preprocessing.utils import Cosine_Similarity
+from deepctr.preprocessing.utils import dot_similarity
 
 
 class SDM(BaseTower):
@@ -52,7 +52,7 @@ class SDM(BaseTower):
             self.item_dnn_embedding = self.item_dnn(item_dnn_input)
 
         if len(self.user_dnn_feature_columns) > 0 and len(self.item_dnn_feature_columns) > 0:
-            score = Cosine_Similarity(self.user_dnn_embedding, self.item_dnn_embedding, gamma=self.gamma)
+            score = dot_similarity(self.user_dnn_embedding, self.item_dnn_embedding, gamma=self.gamma)
             output = self.out(score)
             return output
 
