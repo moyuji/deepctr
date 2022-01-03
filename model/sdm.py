@@ -70,7 +70,7 @@ class SDM(BaseTower):
         if epoch < self.norm_weight_warmup:
             self.item_dnn.norm_weight += self.item_norm_weight_inc
             self.user_dnn.norm_weight += self.user_norm_weight_inc
-            print(self.item_dnn.norm_weight, self.user_dnn.norm_weight)
+            # print(self.item_dnn.norm_weight, self.user_dnn.norm_weight)
         if epoch == self.gating_warmup:
             self.item_dnn.gate = False
             self.user_dnn.gate = False
