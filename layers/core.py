@@ -111,7 +111,7 @@ class SparseEncoding(nn.Module):
         super(SparseEncoding, self).__init__()
         last_hidden_dim = hidden_units[-1]
         self.seed = seed
-        self.norm = nn.BatchNorm1d(output_dim, affine=False, momentum=0.5)
+        self.norm = nn.BatchNorm1d(output_dim, affine=False, momentum=0.1)
         self.norm_weight = norm_weight
         self.shared = DNN(inputs_dim=inputs_dim,
                           hidden_units=hidden_units,
