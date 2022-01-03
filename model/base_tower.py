@@ -125,6 +125,7 @@ class BaseTower(nn.Module):
             loss_epoch = 0
             total_loss_epoch = 0
             train_result = {}
+            model = self.train()
             print(f'training {self.training}')
             with tqdm(enumerate(train_loader), disable=verbose != 1) as t:
                 for _, (x_train, y_train) in t:
