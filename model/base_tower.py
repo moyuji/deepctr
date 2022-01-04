@@ -169,7 +169,7 @@ class BaseTower(nn.Module):
                 eval_result = self.evaluate(val_x, val_y, batch_size)
                 for name, result in eval_result.items():
                     epoch_logs["val_" + name] = result
-                    self.log(f'val/{name}', epoch_logs[name])
+                    self.log(f'val/{name}', result)
 
             self.train_epoch_end(epoch)
 
