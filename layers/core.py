@@ -107,7 +107,7 @@ class LocalActivationUnit(nn.Module):
 class SparseEncoding(nn.Module):
     def __init__(self, inputs_dim, hidden_units, activation='relu', l2_reg=0, dropout_rate=0.0, use_bn=False,
                  init_std=0.0001, dice_dim=3, seed=1024, device='cpu', output_dim=4, norm_weight=0.0, beta=0.1,
-                 low=-0.1, high=1.1, momentum=0.1):
+                 low=-0.1, high=1.1, momentum=0.1, nd_sample=False):
         super(SparseEncoding, self).__init__()
         last_hidden_dim = hidden_units[-1]
         self.seed = seed
@@ -142,6 +142,7 @@ class SparseEncoding(nn.Module):
             nn.Sigmoid(),
             nn.Linear(last_hidden_dim, output_dim),
         )
+        self.nd_sample = nd_sample
         self.beta = beta
         self.high = high
         self.low = low
@@ -166,7 +167,7 @@ class SparseEncoding(nn.Module):
         return embedding
 
     def sample_attention(self, weights):
-        if self.training:
+        if self.training or self.nd_sample:
             eps = torch.rand_like(weights)
             s = torch.sigmoid((torch.log(eps) - torch.log(1.0 - eps) + weights) / self.beta)
         else:

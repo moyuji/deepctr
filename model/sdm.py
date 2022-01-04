@@ -9,7 +9,7 @@ class SDM(BaseTower):
                  dnn_hidden_units=(300, 300, 128), dnn_activation='relu', l2_reg_dnn=0, l2_reg_embedding=1e-6,
                  dnn_dropout=0, init_std=0.0001, seed=1024, task='binary', device='cpu', gpus=None, output_dim=1024,
                  item_norm_weight_start=0.0, user_norm_weight_start=0.0, item_norm_weight_end=0.0, user_norm_weight_end=0.0,
-                 norm_weight_warmup=1, gating_warmup=5, beta=0.1, momentum=0.1, logger=None):
+                 norm_weight_warmup=1, gating_warmup=5, beta=0.1, momentum=0.1, logger=None, nd_sample=False):
         super(SDM, self).__init__(user_dnn_feature_columns, item_dnn_feature_columns,
                                   l2_reg_embedding=l2_reg_embedding, init_std=init_std, seed=seed, task=task,
                                   device=device, gpus=gpus, logger=logger)
@@ -17,14 +17,14 @@ class SDM(BaseTower):
             self.user_dnn = SparseEncoding(compute_input_dim(user_dnn_feature_columns), dnn_hidden_units, beta=beta,
                                            activation=dnn_activation, l2_reg=l2_reg_dnn, dropout_rate=dnn_dropout,
                                            use_bn=dnn_use_bn, init_std=init_std, device=device, output_dim=output_dim,
-                                           norm_weight=user_norm_weight_start, momentum=momentum)
+                                           norm_weight=user_norm_weight_start, momentum=momentum, nd_sample=nd_sample)
             self.user_dnn_embedding = None
 
         if len(item_dnn_feature_columns) > 0:
             self.item_dnn = SparseEncoding(compute_input_dim(item_dnn_feature_columns), dnn_hidden_units, beta=beta,
                                            activation=dnn_activation, l2_reg=l2_reg_dnn, dropout_rate=dnn_dropout,
                                            use_bn=dnn_use_bn, init_std=init_std, device=device, output_dim=output_dim,
-                                           norm_weight=item_norm_weight_start, momentum=momentum)
+                                           norm_weight=item_norm_weight_start, momentum=momentum, nd_sample=nd_sample)
             self.item_dnn_embedding = None
         self.item_norm_weight_inc = 1.0 * (item_norm_weight_end - item_norm_weight_start) / norm_weight_warmup
         self.user_norm_weight_inc = 1.0 * (user_norm_weight_end - user_norm_weight_start) / norm_weight_warmup
