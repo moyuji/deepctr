@@ -17,8 +17,12 @@ from deepctr.preprocessing.utils import slice_arrays
 
 
 class BaseTower(nn.Module):
+    def log(self, key, value):
+        if self.logger is not None:
+            self.logger[key] = value
+
     def __init__(self, user_dnn_feature_columns, item_dnn_feature_columns, l2_reg_embedding=1e-5,
-                 init_std=0.0001, seed=1024, task='binary', device='cpu', gpus=None):
+                 init_std=0.0001, seed=1024, task='binary', device='cpu', gpus=None, logger=None):
         super(BaseTower, self).__init__()
         torch.manual_seed(seed)
 
@@ -49,6 +53,7 @@ class BaseTower(nn.Module):
         # parameters of callbacks
         self._is_graph_network = True  # used for ModelCheckpoint
         self.stop_training = False  # used for EarlyStopping
+        self.logger = logger
 
     def fit(self, x=None, y=None, batch_size=None, epochs=1, verbose=1, initial_epoch=0, validation_split=0.,
             validation_data=None, shuffle=True, callbacks=None):
@@ -126,6 +131,7 @@ class BaseTower(nn.Module):
             total_loss_epoch = 0
             train_result = {}
             model = self.train()
+            self.log('epoch', epoch)
             with tqdm(enumerate(train_loader), disable=verbose != 1) as t:
                 for _, (x_train, y_train) in t:
                     x = x_train.to(self.device).float()
@@ -154,13 +160,16 @@ class BaseTower(nn.Module):
 
             # add epoch_logs
             epoch_logs["loss"] = total_loss_epoch / sample_num
+            self.log(f'train/loss', epoch_logs["loss"])
             for name, result in train_result.items():
                 epoch_logs[name] = np.sum(result) / steps_per_epoch
+                self.log(f'train/{name}', epoch_logs[name])
 
             if do_validation:
                 eval_result = self.evaluate(val_x, val_y, batch_size)
                 for name, result in eval_result.items():
                     epoch_logs["val_" + name] = result
+                    self.log(f'val/{name}', epoch_logs[name])
 
             self.train_epoch_end(epoch)
 
