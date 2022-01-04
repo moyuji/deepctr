@@ -19,7 +19,7 @@ from deepctr.preprocessing.utils import slice_arrays
 class BaseTower(nn.Module):
     def log(self, key, value):
         if self.logger is not None:
-            self.logger[key] = value
+            self.logger[key].log(value)
 
     def __init__(self, user_dnn_feature_columns, item_dnn_feature_columns, l2_reg_embedding=1e-5,
                  init_std=0.0001, seed=1024, task='binary', device='cpu', gpus=None, logger=None):
