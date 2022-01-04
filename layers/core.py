@@ -107,11 +107,11 @@ class LocalActivationUnit(nn.Module):
 class SparseEncoding(nn.Module):
     def __init__(self, inputs_dim, hidden_units, activation='relu', l2_reg=0, dropout_rate=0.0, use_bn=False,
                  init_std=0.0001, dice_dim=3, seed=1024, device='cpu', output_dim=4, norm_weight=0.0, beta=0.1,
-                 low=-0.1, high=1.1):
+                 low=-0.1, high=1.1, momentum=0.1):
         super(SparseEncoding, self).__init__()
         last_hidden_dim = hidden_units[-1]
         self.seed = seed
-        self.norm = nn.BatchNorm1d(output_dim, affine=False, momentum=0.1)
+        self.norm = nn.BatchNorm1d(output_dim, affine=False, momentum=momentum)
         self.norm_weight = norm_weight
         self.shared = DNN(inputs_dim=inputs_dim,
                           hidden_units=hidden_units,
