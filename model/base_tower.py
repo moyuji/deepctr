@@ -157,7 +157,7 @@ class BaseTower(nn.Module):
                             train_result[name].append(metric_fun(
                                 y.cpu().data.numpy(), y_pred.cpu().data.numpy().astype('float64')
                             ))
-
+            
             # add epoch_logs
             epoch_logs["loss"] = total_loss_epoch / sample_num
             self.log(f'train/loss', epoch_logs["loss"])
@@ -165,13 +165,15 @@ class BaseTower(nn.Module):
                 epoch_logs[name] = np.sum(result) / steps_per_epoch
                 self.log(f'train/{name}', epoch_logs[name])
 
+            self.train_epoch_end(epoch)
+
             if do_validation:
                 eval_result = self.evaluate(val_x, val_y, batch_size)
                 for name, result in eval_result.items():
                     epoch_logs["val_" + name] = result
                     self.log(f'val/{name}', result)
 
-            self.train_epoch_end(epoch)
+            self.val_epoch_end(epoch)
 
             if verbose > 0:
                 epoch_time = int(time.time() - start_time)
@@ -370,6 +372,5 @@ class BaseTower(nn.Module):
     def train_epoch_end(self, epoch):
         pass
 
-
-
-
+    def val_epoch_end(self, epoch):
+        pass

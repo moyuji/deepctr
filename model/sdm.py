@@ -2,7 +2,7 @@ from deepctr.model.base_tower import BaseTower
 from deepctr.preprocessing.inputs import combined_dnn_input, compute_input_dim
 from deepctr.layers.core import SparseEncoding
 from deepctr.preprocessing.utils import dot_similarity
-
+import numpy as np
 
 class SDM(BaseTower):
     def __init__(self, user_dnn_feature_columns, item_dnn_feature_columns, gamma=1, dnn_use_bn=True,
@@ -66,7 +66,7 @@ class SDM(BaseTower):
         else:
             raise Exception("input Error! user and item feature columns are empty.")
 
-    def train_epoch_end(self, epoch):
+    def val_epoch_end(self, epoch):
         if epoch < self.norm_weight_warmup:
             self.item_dnn.norm_weight += self.item_norm_weight_inc
             self.user_dnn.norm_weight += self.user_norm_weight_inc
@@ -74,3 +74,18 @@ class SDM(BaseTower):
         if epoch == self.gating_warmup:
             self.item_dnn.gate = False
             self.user_dnn.gate = False
+
+        item_embedding=self.item_dnn_embedding.cpu().numpy()
+        user_embedding=self.user_dnn_embedding.cpu().numpy()
+        self.log('val/item_emb_r', np.mean(item_embedding / (item_embedding+0.00000001)))
+        self.log('val/user_emb_r', np.mean(user_embedding / (user_embedding+0.00000001)))
+        v = np.matmul(user_embedding, item_embedding.T)
+        print('val/callback', np.mean(v / (v+0.00000001)))
+
+    def train_epoch_end(self, epoch):
+        item_embedding=self.item_dnn_embedding.cpu().numpy()
+        user_embedding=self.user_dnn_embedding.cpu().numpy()
+        self.log('train/item_emb_r', np.mean(item_embedding / (item_embedding+0.00000001)))
+        self.log('train/user_emb_r', np.mean(user_embedding / (user_embedding+0.00000001)))
+        v = np.matmul(user_embedding, item_embedding.T)
+        print('train/callback', np.mean(v / (v+0.00000001)))
