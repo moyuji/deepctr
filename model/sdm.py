@@ -75,16 +75,16 @@ class SDM(BaseTower):
             self.item_dnn.gate = False
             self.user_dnn.gate = False
 
-        item_embedding=self.item_dnn_embedding.cpu().data.numpy()
-        user_embedding=self.user_dnn_embedding.cpu().data.numpy()
+        item_embedding=np.abs(self.item_dnn_embedding.cpu().data.numpy())
+        user_embedding=np.abs(self.user_dnn_embedding.cpu().data.numpy())
         self.log('val/ir', np.mean(item_embedding / (item_embedding+0.00000001)))
         self.log('val/ur', np.mean(user_embedding / (user_embedding+0.00000001)))
         v = np.matmul(user_embedding, item_embedding.T)
         self.log('val/cb', np.mean(v / (v+0.00000001)))
 
     def train_epoch_end(self, epoch):
-        item_embedding=self.item_dnn_embedding.cpu().data.numpy()
-        user_embedding=self.user_dnn_embedding.cpu().data.numpy()
+        item_embedding=np.abs(self.item_dnn_embedding.cpu().data.numpy())
+        user_embedding=np.abs(self.user_dnn_embedding.cpu().data.numpy())
         self.log('train/ir', np.mean(item_embedding / (item_embedding+0.00000001)))
         self.log('train/ur', np.mean(user_embedding / (user_embedding+0.00000001)))
         v = np.matmul(user_embedding, item_embedding.T)
