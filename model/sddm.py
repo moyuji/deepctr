@@ -1,6 +1,7 @@
 from deepctr.model.base_tower import BaseTower
 from deepctr.preprocessing.inputs import combined_dnn_input, compute_input_dim
 from deepctr.layers.core import SparseDenseEncoding
+import torch
 from deepctr.preprocessing.utils import dot_similarity
 import numpy as np
 
@@ -56,8 +57,10 @@ class SDM(BaseTower):
         if len(self.user_dnn_feature_columns) > 0 and len(self.item_dnn_feature_columns) > 0:
             score = dot_similarity(self.user_dnn_embedding, self.item_dnn_embedding, gamma=self.gamma)
             if not self.is_warmup:
-                score = score * self.user_dnn_weight
-                score = score * self.item_dnn_weight
+                weight = self.user_dnn_weight * self.item_dnn_weight
+                weight = torch.sum(weight, dim=-1)
+                weight = torch.tanh(weight)
+                score = score * weight
             output = self.out(score)
             return output
 
