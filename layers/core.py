@@ -204,7 +204,6 @@ class SparseDenseEncoding(nn.Module):
         self.high = high
         self.low = low
         self.to(device)
-        self.gate = True
 
     def forward(self, inputs):
         import numpy as np
@@ -212,8 +211,6 @@ class SparseDenseEncoding(nn.Module):
         shared = self.shared(inputs)
         embedding = self.embed_tower(shared)
         embedding = nn.functional.normalize(embedding)
-        if self.gate:
-            return embedding
         alpha0 = self.reg_tower(shared)
         alpha0 = self.norm(alpha0)
         alpha = alpha0 + self.norm_weight
@@ -221,8 +218,7 @@ class SparseDenseEncoding(nn.Module):
         weight = torch.max(weight, dim=1)
         # if random.random() < 0.01:
             # print(f'{self.norm_weight} alpha {np.mean(alpha.cpu().detach().numpy())} weight {np.mean(weight.cpu().detach().numpy())}')
-        embedding = embedding * weight
-        return embedding
+        return embedding, weight
 
     def sample_attention(self, weights):
         if self.training or self.nd_sample:
