@@ -43,5 +43,4 @@ def Cosine_Similarity(query, candidate, gamma=1, dim=-1):
 
 def dot_similarity(query, candidate, gamma=1):
     score = torch.sum(torch.multiply(query, candidate), dim=-1)
-    score = torch.clamp(score, -1, 1.0)*gamma
     return score
