@@ -225,6 +225,6 @@ class SparseDenseEncoding(nn.Module):
             eps = torch.rand_like(weights)
             s = torch.sigmoid((torch.log(eps) - torch.log(1.0 - eps) + weights) / self.beta)
         else:
-            s = torch.sigmoid(weights / self.beta)
+            s = torch.sigmoid(weights / 0.001)
         s = s * (self.high - self.low) + self.low
         return F.hardtanh(s, min_val=0, max_val=1)
