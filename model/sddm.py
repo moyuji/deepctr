@@ -36,6 +36,7 @@ class SDM(BaseTower):
         self.device = device
         self.gpus = gpus
         self.gating_warmup = gating_warmup
+        self.is_warmup = True
 
     def forward(self, inputs):
         if len(self.user_dnn_feature_columns) > 0:
@@ -43,17 +44,20 @@ class SDM(BaseTower):
                 self.input_from_feature_columns(inputs, self.user_dnn_feature_columns, self.user_embedding_dict)
 
             user_dnn_input = combined_dnn_input(user_sparse_embedding_list, user_dense_value_list)
-            self.user_dnn_embedding = self.user_dnn(user_dnn_input)
+            self.user_dnn_embedding, self.user_dnn_weight = self.user_dnn(user_dnn_input)
 
         if len(self.item_dnn_feature_columns) > 0:
             item_sparse_embedding_list, item_dense_value_list = \
                 self.input_from_feature_columns(inputs, self.item_dnn_feature_columns, self.item_embedding_dict)
 
             item_dnn_input = combined_dnn_input(item_sparse_embedding_list, item_dense_value_list)
-            self.item_dnn_embedding = self.item_dnn(item_dnn_input)
+            self.item_dnn_embedding, self.item_dnn_weight = self.item_dnn(item_dnn_input)
 
         if len(self.user_dnn_feature_columns) > 0 and len(self.item_dnn_feature_columns) > 0:
             score = dot_similarity(self.user_dnn_embedding, self.item_dnn_embedding, gamma=self.gamma)
+            if not self.is_warmup:
+                score = score * self.user_dnn_weight
+                score = score * self.item_dnn_weight
             output = self.out(score)
             return output
 
@@ -72,11 +76,10 @@ class SDM(BaseTower):
             self.user_dnn.norm_weight += self.user_norm_weight_inc
             # print(self.item_dnn.norm_weight, self.user_dnn.norm_weight)
         if epoch == self.gating_warmup:
-            self.item_dnn.gate = False
-            self.user_dnn.gate = False
+            self.is_warmup = False
 
-        item_embedding=np.abs(self.item_dnn_embedding.cpu().data.numpy())
-        user_embedding=np.abs(self.user_dnn_embedding.cpu().data.numpy())
+        item_embedding=np.abs(self.item_dnn_weight.cpu().data.numpy())
+        user_embedding=np.abs(self.user_dnn_weight.cpu().data.numpy())
         self.log('val/ir', np.mean(item_embedding / (item_embedding+0.00000001)))
         self.log('val/ur', np.mean(user_embedding / (user_embedding+0.00000001)))
         v = np.matmul(user_embedding, item_embedding.T)
