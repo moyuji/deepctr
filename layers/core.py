@@ -174,3 +174,61 @@ class SparseEncoding(nn.Module):
             s = torch.sigmoid(weights / self.beta)
         s = s * (self.high - self.low) + self.low
         return F.hardtanh(s, min_val=0, max_val=1)
+
+class SparseDenseEncoding(nn.Module):
+    def __init__(self, inputs_dim, hidden_units, activation='relu', l2_reg=0, dropout_rate=0.0, use_bn=False,
+                 init_std=0.0001, dice_dim=3, seed=1024, device='cpu', output_dim=128, dense_dim=30, norm_weight=0.0, beta=0.1,
+                 low=-0.1, high=1.1, momentum=0.1, nd_sample=False):
+        super(SparseEncoding, self).__init__()
+        last_hidden_dim = hidden_units[-1]
+        self.seed = seed
+        self.norm = nn.BatchNorm1d(output_dim, affine=False, momentum=momentum)
+        self.norm_weight = norm_weight
+        self.shared = DNN(inputs_dim=inputs_dim,
+                          hidden_units=hidden_units,
+                          activation=activation,
+                          l2_reg=l2_reg,
+                          dropout_rate=dropout_rate,
+                          dice_dim=dice_dim,
+                          use_bn=use_bn)
+        self.embed_tower = nn.Sequential(
+            nn.ReLU(),
+            nn.Linear(last_hidden_dim, dense_dim),
+        )
+        self.reg_tower = nn.Sequential(
+            nn.Sigmoid(),
+            nn.Linear(last_hidden_dim, output_dim),
+        )
+        self.nd_sample = nd_sample
+        self.beta = beta
+        self.high = high
+        self.low = low
+        self.to(device)
+        self.gate = True
+
+    def forward(self, inputs):
+        import numpy as np
+        import random
+        shared = self.shared(inputs)
+        embedding = self.embed_tower(shared)
+        embedding = nn.functional.normalize(embedding)
+        if self.gate:
+            return embedding
+        alpha0 = self.reg_tower(shared)
+        alpha0 = self.norm(alpha0)
+        alpha = alpha0 + self.norm_weight
+        weight = self.sample_attention(alpha)
+        weight = torch.max(weight, dim=1)
+        # if random.random() < 0.01:
+            # print(f'{self.norm_weight} alpha {np.mean(alpha.cpu().detach().numpy())} weight {np.mean(weight.cpu().detach().numpy())}')
+        embedding = embedding * weight
+        return embedding
+
+    def sample_attention(self, weights):
+        if self.training or self.nd_sample:
+            eps = torch.rand_like(weights)
+            s = torch.sigmoid((torch.log(eps) - torch.log(1.0 - eps) + weights) / self.beta)
+        else:
+            s = torch.sigmoid(weights / self.beta)
+        s = s * (self.high - self.low) + self.low
+        return F.hardtanh(s, min_val=0, max_val=1)
