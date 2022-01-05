@@ -215,7 +215,8 @@ class SparseDenseEncoding(nn.Module):
         alpha0 = self.norm(alpha0)
         alpha = alpha0 + self.norm_weight
         weight = self.sample_attention(alpha)
-        weight, _ = torch.max(weight, dim=1)
+        weight = torch.sum(weight, dim=-1)
+        weight = torch.tanh(weight)
         # if random.random() < 0.01:
             # print(f'{self.norm_weight} alpha {np.mean(alpha.cpu().detach().numpy())} weight {np.mean(weight.cpu().detach().numpy())}')
         return embedding, weight
