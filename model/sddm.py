@@ -60,7 +60,7 @@ class SDM(BaseTower):
             if not self.is_warmup:
                 weight = self.user_dnn_weight * self.item_dnn_weight
                 weight = torch.sum(weight, dim=-1) * self.sigma
-                weight = torch.tanh(weight)
+                weight = 1.0 - torch.tanh(weight)
                 score = score * weight
             output = self.out(score)
             return output
