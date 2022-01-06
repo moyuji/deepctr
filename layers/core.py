@@ -222,7 +222,7 @@ class SparseDenseEncoding(nn.Module):
     def sample_attention(self, weights):
         if self.training or self.nd_sample:
             eps = torch.rand_like(weights)
-            s = torch.sigmoid((torch.log(eps) - torch.log(1.0 - eps) + weights) / self.beta)
+            s = torch.sigmoid((torch.log(eps) - torch.log(1.0 - eps) ) / self.beta)
         else:
             s = torch.sigmoid(weights / 0.001)
         s = s * (self.high - self.low) + self.low
