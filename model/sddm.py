@@ -90,8 +90,8 @@ class SDM(BaseTower):
         self.log('val/cb', np.mean(v / (v+0.00000001)))
 
     def train_epoch_end(self, epoch):
-        item_embedding=np.abs(self.item_dnn_embedding.cpu().data.numpy())
-        user_embedding=np.abs(self.user_dnn_embedding.cpu().data.numpy())
+        item_embedding=np.abs(self.item_dnn_weight.cpu().data.numpy())
+        user_embedding=np.abs(self.user_dnn_weight.cpu().data.numpy())
         self.log('train/ir', np.mean(item_embedding / (item_embedding+0.00000001)))
         self.log('train/ur', np.mean(user_embedding / (user_embedding+0.00000001)))
         v = np.matmul(user_embedding, item_embedding.T)
